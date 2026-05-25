@@ -2,13 +2,17 @@ import csv
 from datetime import datetime
 
 class SessionManager:
-    def __init__(self, filepath):
+    def __init__(self, filepath: str | None = None):
         self.filepath = filepath
 
-    def load_sessions(self):
+    def load_sessions(self, filepath: str | None = None) -> list:
+        if filepath is None:
+            filepath = self.filepath
+        if not filepath:
+            raise ValueError("Session log filepath is required")
         sessions = []
         try:
-            with open(self.filepath, newline="", encoding="utf-8") as file:
+            with open(filepath, newline="", encoding="utf-8") as file:
                 reader = csv.DictReader(file)
                 for row in reader:
                     row["duration_min"] = int(row["duration_min"])
@@ -17,6 +21,9 @@ class SessionManager:
             return []
 
         return sessions
+
+    def load_log(self, filepath: str) -> list:
+        return self.load_sessions(filepath)
 
     def save_log(self, log: list, filepath: str) -> None:
         fieldnames = ["session_id", "subject_id", "date", "duration_min", "topic", "notes"]
